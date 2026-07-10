@@ -11,8 +11,8 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # 頁面高質感設定
 st.set_page_config(page_title="🧳 智慧隨身旅遊管家", layout="wide", initial_sidebar_state="expanded")
 
-# 注入自訂 CSS，讓介面像 App 一樣精美、消除陽春感
-st.markdown(F"""
+# 注入自訂 CSS，使用安全變數包裹，100% 繞過類型檢查與變數誤判
+css_style = """
 <style>
     .stApp { background-color: #121214; color: #e1e1e6; }
     div[data-testid="stMetricValue"] { font-size: 1.8rem !important; font-weight: bold; color: #00efff; }
@@ -22,7 +22,8 @@ st.markdown(F"""
     .transit-card { background-color: #1f1b24; padding: 15px; border-radius: 8px; border-left: 5px solid #bb86fc; margin-bottom: 10px; }
     div.stButton > button:first-child { border-radius: 8px; }
 </style>
-""", unsafe_allowed_html=True)
+"""
+st.markdown(str(css_style), unsafe_allowed_html=True)
 
 # --- 2. 側邊欄：旅程庫與管理 ---
 st.sidebar.title("🧳 我的旅遊庫")
