@@ -137,7 +137,7 @@ st.title(f"✈️ {current_trip['name']}")
 if current_trip['subtitle']:
     st.caption(f"💡 {current_trip['subtitle']}")
 
-tabs = st.tabs(["📅 時間線行程規劃", "💰 Spliit 級隨手分帳", "🎒 實用工具箱"])
+tabs = st.tabs(["📅 時間線行程規劃", "💰 隨手分帳", "🎒 實用工具箱"])
 
 # ==================== 頁籤一：時間線行程規劃 ====================
 with tabs[0]:
@@ -200,7 +200,7 @@ with tabs[0]:
 
 # ==================== 頁籤二：Spliit 級隨手分帳系統 ====================
 with tabs[1]:
-    st.header("💰 智慧帳本 (Spliit 模式)")
+    st.header("💰 智慧帳本")
     
     # 記帳輸入區
     with st.container(border=True):
