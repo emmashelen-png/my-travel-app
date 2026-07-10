@@ -62,15 +62,30 @@ else:
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] span {{ color: {cfg['sidebar_text']} !important; }}
         
-        /* 強制將下拉選單收合與點開的文字顏色改掉，絕不允許出現灰色隱形 */
+        /* 🎯 最終解決：將所有輸入框與選單在夜間/日間模式下，一律強制維持「白底深色字」 */
+        /* 1. 鎖定下拉選單：不管背景多黑，選單外框一律強制白底、文字絕對深色 */
         div[data-baseweb="select"] div[role="button"],
-        div[data-baseweb="select"] div,
         div[data-baseweb="select"] span,
         div[data-baseweb="select"] p {{
-            color: #1E293B !important; 
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
             font-weight: 600 !important;
         }}
-        div[data-baseweb="select"] svg {{ fill: #475569 !important; }}
+        
+        /* 2. 鎖定普通輸入框（文字、密碼、數字、時間輸入框）：一律強制白底、字體深色 */
+        div[data-baseweb="input"] input,
+        div[data-baseweb="textarea"] textarea,
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {{
+            background-color: #FFFFFF !important;
+            color: #0F172A !important; /* 強制輸入的字體絕對是清楚的深石墨色 */
+            font-weight: 600 !important;
+            -webkit-text-fill-color: #0F172A !important; /* 確保手機版瀏覽器也不會褪色 */
+        }}
+        
+        /* 3. 小箭頭圖標加深對比 */
+        div[data-baseweb="select"] svg {{ fill: #334155 !important; }}
 
         /* 下拉選單展開後的清單防護 */
         ul[role="listbox"] {{ background-color: {list_bg_color} !important; border: 1px solid {cfg['border']} !important; border-radius: 12px !important; }}
