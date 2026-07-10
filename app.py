@@ -93,7 +93,7 @@ with tabs[0]:
             st.rerun()
 
     # 顯示時間線
-    iti_res = supabase.table("itineraries").select("*").eq("trip_id", current_trip_id).execute()
+    iti_res = supabase.table("itineraries").select("*").eq("trip_id", current_trip_id).order("day_number").order("time_slot").execute()   
     if iti_res.data:
         df_iti = pd.DataFrame(iti_res.data)
         for day_num, group in df_iti.groupby("day_number"):
@@ -154,7 +154,7 @@ with tabs[1]:
                 st.rerun()
 
     # 計算統計與誰欠誰錢（核心核心演算法）
-    exp_res = supabase.table("expenses").eq("trip_id", current_trip_id).execute()
+    exp_res = supabase.table("expenses").select("*").eq("trip_id", current_trip_id).execute()
     if exp_res.data:
         st.subheader("📊 費用統計與圖表")
         df_exp = pd.DataFrame(exp_res.data)
