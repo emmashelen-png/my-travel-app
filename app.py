@@ -27,7 +27,7 @@ theme_styles = {
     "🌿 靜謐灰綠 (北歐極簡風)": {"bg": "#F4F7F4", "sidebar_bg": "#FFFFFF", "card": "#FFFFFF", "text": "#162E1A", "sidebar_text": "#2B4C30", "accent": "#16A34A", "border": "#D2E0D1", "subtext": "#5A735E", "is_dark": False}
 }
 
-# --- 3. 雲端相容版 CSS 注入（精準重寫子元件文字，徹底解決選單白色隱形問題） ---
+# --- 3. 終極 CSS 注入（精準消滅下拉選單選中文字隱形的問題） ---
 if theme_choice == "🌓 智能感光 (隨系統自動日夜切換)":
     st.markdown("""
     <style>
@@ -62,24 +62,18 @@ else:
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] span {{ color: {cfg['sidebar_text']} !important; }}
         
-        /* ==================== 🎯 核心修復：徹底粉碎下拉選單文字白化/灰色隱形 ==================== */
+        /* ==================== 🎯 核心修正：強力重寫選單「被選中」的單一項目文字顏色 ==================== */
         
-        /* 1. 精準攔截下拉選單中所有可能的子標籤（div, span, p），強制改為高對比深色 */
-        div[data-baseweb="select"] div[role="button"],
-        div[data-baseweb="select"] div,
-        div[data-baseweb="select"] span,
-        div[data-baseweb="select"] p,
-        .stSelectbox div[data-baseweb="select"] *,
-        .stSidebar div[data-baseweb="select"] * {{
+        /* 1. 精準鎖定點開選單後，第一個被固定在框框裡的選中文字，強制改為深色 */
+        div[data-baseweb="select"] [role="button"] div,
+        div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p,
+        div[style*="color: rgb(255, 255, 255)"], 
+        .stSelectbox div[role="button"] {{
             color: #1E293B !important; 
             font-weight: 600 !important;
-            -webkit-text-fill-color: #1E293B !important; /* 強制覆蓋瀏覽器內建的反白文字渲染 */
         }}
         
-        /* 2. 小箭頭圖標同步轉為深石墨色 */
-        div[data-baseweb="select"] svg {{ fill: #334155 !important; }}
-
-        /* 3. 全域單行文字、多行文字、數字、密碼輸入框 */
+        /* 2. 全域輸入框背景與文字對比強化 */
         div[data-testid="stTextInput"] input,
         div[data-testid="stTextArea"] textarea,
         div[data-testid="stNumberInput"] input {{
@@ -90,6 +84,7 @@ else:
             -webkit-text-fill-color: #1E293B !important;
         }}
         
+        div[data-baseweb="select"] svg,
         div[data-testid="stTextInput"] button svg,
         div[data-testid="stNumberInput"] button svg {{
             fill: #334155 !important;
@@ -104,7 +99,7 @@ else:
             color: #FFFFFF !important; 
         }}
         
-        /* 📊 數據指標與折疊卡片微動態動畫 */
+        /* 📊 數據指標與折疊卡片微浮動與微縮放動畫 */
         div[data-testid="stMetric"], div[data-testid="stExpander"] {{
             background: {cfg['card']} !important;
             border: 1px solid {cfg['border']} !important;
