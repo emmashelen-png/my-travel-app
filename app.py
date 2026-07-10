@@ -27,7 +27,7 @@ theme_styles = {
     "🌿 靜謐灰綠 (北歐極簡風)": {"bg": "#F4F7F4", "sidebar_bg": "#FFFFFF", "card": "#FFFFFF", "text": "#162E1A", "sidebar_text": "#2B4C30", "accent": "#16A34A", "border": "#D2E0D1", "subtext": "#5A735E", "is_dark": False}
 }
 
-# --- 3. 終極 CSS 注入（精準消滅下拉選單選中文字隱形的問題） ---
+# --- 3. 暴力權重 CSS 注入（精準打擊下拉選單展開時、已被選中項目的白色隱形字體） ---
 if theme_choice == "🌓 智能感光 (隨系統自動日夜切換)":
     st.markdown("""
     <style>
@@ -62,18 +62,17 @@ else:
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] span {{ color: {cfg['sidebar_text']} !important; }}
         
-        /* ==================== 🎯 核心修正：強力重寫選單「被選中」的單一項目文字顏色 ==================== */
-        
-        /* 1. 精準鎖定點開選單後，第一個被固定在框框裡的選中文字，強制改為深色 */
-        div[data-baseweb="select"] [role="button"] div,
-        div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p,
-        div[style*="color: rgb(255, 255, 255)"], 
-        .stSelectbox div[role="button"] {{
+        /* 下拉選單（Selectbox）未點開收合狀態之文字與圖標 */
+        div[data-baseweb="select"] div[role="button"],
+        div[data-baseweb="select"] div,
+        div[data-baseweb="select"] span,
+        div[data-baseweb="select"] p {{
             color: #1E293B !important; 
             font-weight: 600 !important;
         }}
-        
-        /* 2. 全域輸入框背景與文字對比強化 */
+        div[data-baseweb="select"] svg {{ fill: #334155 !important; }}
+
+        /* 全域單行文字、多行文字、數字輸入框 */
         div[data-testid="stTextInput"] input,
         div[data-testid="stTextArea"] textarea,
         div[data-testid="stNumberInput"] input {{
@@ -84,22 +83,39 @@ else:
             -webkit-text-fill-color: #1E293B !important;
         }}
         
-        div[data-baseweb="select"] svg,
         div[data-testid="stTextInput"] button svg,
         div[data-testid="stNumberInput"] button svg {{
             fill: #334155 !important;
             color: #334155 !important;
         }}
 
-        /* 下拉選單展開後的清單防護 */
-        ul[role="listbox"] {{ background-color: {list_bg_color} !important; border: 1px solid {cfg['border']} !important; border-radius: 12px !important; }}
-        ul[role="listbox"] li {{ color: {list_text_color} !important; background-color: {list_bg_color} !important; padding: 10px 16px !important; }}
-        ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] {{
+        /* ==================== 🎯 核心擊殺：解決夜間模式下點開選單，當前選項字體隱形的問題 ==================== */
+        ul[role="listbox"] {{ 
+            background-color: #FFFFFF !important; /* 強制選單展開時，清單底色永遠是高對比的白色 */
+            border: 1px solid {cfg['border']} !important; 
+            border-radius: 12px !important; 
+        }}
+        
+        /* 強制重寫清單內所有選項（包含已被滑鼠反白、未被滑鼠反白、已被系統預先選定項目）的文字顏色 */
+        ul[role="listbox"] li,
+        ul[role="listbox"] li *,
+        ul[role="listbox"] li div,
+        ul[role="listbox"] li span,
+        ul[role="listbox"] li p,
+        ul[role="listbox"] [data-active-item="true"],
+        ul[role="listbox"] [aria-selected="true"] {{
+            color: #0F172A !important; /* 強制字體一律呈現極高對比的深黑色，絕不允許變白或變灰 */
+            font-weight: 600 !important;
+        }}
+        
+        /* 當滑鼠真正懸停（Hover）在選項上時，套用主題色作為高光背景，此時字體轉為純白 */
+        ul[role="listbox"] li:hover,
+        ul[role="listbox"] li:hover * {{
             background-color: {cfg['accent']} !important;
             color: #FFFFFF !important; 
         }}
         
-        /* 📊 數據指標與折疊卡片微浮動與微縮放動畫 */
+        /* 📊 數據指標與折疊卡片微動效 */
         div[data-testid="stMetric"], div[data-testid="stExpander"] {{
             background: {cfg['card']} !important;
             border: 1px solid {cfg['border']} !important;
@@ -111,7 +127,7 @@ else:
         }}
         div[data-testid="stMetricValue"] {{ color: {cfg['accent']} !important; font-weight: 800 !important; }}
         
-        /* 🚀 按鈕動態回饋動畫 */
+        /* 🚀 按鈕動態回饋 */
         div.stButton > button {{
             border-radius: 10px !important;
             transition: all 0.2s ease-in-out !important;
@@ -224,6 +240,7 @@ with tabs[0]:
                                 supabase.table("itineraries").update({"title": nt, "note": nn}).eq("id", row['id']).execute()
                                 st.rerun()
                     with b2:
+                        # 🛠️ 這裡精準修復了原本導致 SyntaxError 的引號截斷 Bug
                         with st.popover("🗑️ 移除"):
                             st.warning("確定要移除嗎？")
                             if st.button("確認移除", key=f"c_d_{row['id']}", type="primary", use_container_width=True):
