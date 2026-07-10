@@ -71,16 +71,33 @@ if theme_choice == "🌓 智能感光 (隨系統自動日夜切換)":
     cfg = theme_styles["✨ 璀璨晶白 (極簡法式白)"] # 保留預設物件變數防呆
 else:
     cfg = theme_styles[theme_choice]
-    # 強力注入指定主題 CSS，重寫 Streamlit 預設的所有髒灰、不鮮明底色
+    # 強力注入指定主題 CSS，並極致優化原生下拉選單（Dropdown）的反白文字對比度
     st.html(f"""
     <style>
         /* 全域底色重寫 */
         .stApp {{ background: {cfg['bg']} !important; color: {cfg['text']} !important; }}
         h1, h2, h3, h4, h5, h6, p, span, label {{ color: {cfg['text']} !important; }}
         
-        /* 側邊欄高質感校正 - 徹底消除字體消失問題 */
+        /* 側邊欄高質感校正 */
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label {{ color: {cfg['sidebar_text']} !important; }}
+        
+        /* === 🎯 核心修復：解決下拉選單點開時選中文字消失、灰髒的問題 === */
+        /* 1. 強制設定下拉選單未點開時，輸入框內文字的顏色 */
+        div[data-basename="data-baseweb"] div {{ color: {cfg['text']} !important; }}
+        
+        /* 2. 當下拉選單展開時，強制所有清單選項的文字顏色與底色 */
+        ul[role="listbox"] li {{
+            color: #0F172A !important; /* 強制選項文字一律為極高對比度的深色（因為選單底色是白色） */
+            background-color: #FFFFFF !important;
+        }}
+        
+        /* 3. 當選單選項被滑鼠懸停（Hover）或處於被選中狀態時的高級視覺反轉 */
+        ul[role="listbox"] li:hover, 
+        ul[role="listbox"] li[aria-selected="true"] {{
+            background-color: {cfg['border']} !important; /* 讓反白背景色跟隨當前主題的精緻邊框色 */
+            color: {cfg['text']} !important; /* 讓反白文字顏色呈現高對比 */
+        }}
         
         /* 頂級卡片工藝與深層陰影 */
         div[data-testid="stMetric"] {{ background: {cfg['card']} !important; border: 1px solid {cfg['border']} !important; box-shadow: {cfg['shadow']} !important; border-radius: 16px !important; }}
