@@ -6,7 +6,7 @@ import requests
 
 # --- 1. 初始化 Supabase 連線 ---
 SUPABASE_URL = "https://xmzpwmpvlfdndwnbxbxf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtenB3bXB2bGZkbmR3bmJ4YnhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MDIyNTMsImV4cCI6MjA5OTE3ODI1M30.lL44XcL7wvPqJrCUPAKL1K8K98YbcDQGWKIKgqLnH8o"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInRefiI6InhtenB3bXB2bGZkbmR3bmJ4YnhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MDIyNTMsImV4cCI6MjA5OTE3ODI1M30.lL44XcL7wvPqJrCUPAKL1K8K98YbcDQGWKIKgqLnH8o"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 st.set_page_config(page_title="隨身旅遊管家", layout="wide", initial_sidebar_state="expanded")
@@ -27,9 +27,9 @@ theme_styles = {
     "🌿 靜謐灰綠 (北歐極簡風)": {"bg": "#F4F7F4", "sidebar_bg": "#FFFFFF", "card": "#FFFFFF", "text": "#162E1A", "sidebar_text": "#2B4C30", "accent": "#16A34A", "border": "#D2E0D1", "subtext": "#5A735E", "is_dark": False}
 }
 
-# --- 3. 暴力權重 CSS 注入（直覺改掉字體顏色，徹底解決隱形與灰色問題） ---
+# --- 3. 雲端相容版 CSS 注入（修正 st.html 錯誤，並徹底解決選單灰色問題） ---
 if theme_choice == "🌓 智能感光 (隨系統自動日夜切換)":
-    st.html("""
+    st.markdown("""
     <style>
         @media (prefers-color-scheme: light) {
             .stApp { background: #F8FAFC !important; color: #0F172A !important; }
@@ -44,16 +44,15 @@ if theme_choice == "🌓 智能感光 (隨系統自動日夜切換)":
             div[data-testid="stMetric"], div[data-testid="stExpander"] { background: #1E293B !important; border: 1px solid #334155 !important; }
         }
     </style>
-    """)
+    """, unsafe_allow_html=True)
     cfg = theme_styles["✨ 經典純白 (極簡日間模式)"]
 else:
     cfg = theme_styles[theme_choice]
     
-    # 決定下拉選單收合狀態與展開清單的極致色彩防禦
     list_text_color = "#1E293B" if not cfg['is_dark'] else "#F8FAFC"
     list_bg_color = "#FFFFFF" if not cfg['is_dark'] else "#1E293B"
     
-    st.html(f"""
+    st.markdown(f"""
     <style>
         /* 全域底色與文字強制顯色 */
         .stApp {{ background: {cfg['bg']} !important; color: {cfg['text']} !important; }}
@@ -63,20 +62,22 @@ else:
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] span {{ color: {cfg['sidebar_text']} !important; }}
         
-        /* 🔥 直球修正：強制將下拉選單收合與點開的文字顏色改掉，絕不允許出現灰色隱形 */
+        /* 強制將下拉選單收合與點開的文字顏色改掉，絕不允許出現灰色隱形 */
         div[data-baseweb="select"] div[role="button"],
-        div[data-baseweb="select"] [data-testid="stMarkdownContainer"] p {{
-            color: #1E293B !important; /* 確保輸入框內文字絕對是極高對比度的深石墨色 */
+        div[data-baseweb="select"] div,
+        div[data-baseweb="select"] span,
+        div[data-baseweb="select"] p {{
+            color: #1E293B !important; 
             font-weight: 600 !important;
         }}
-        div[data-baseweb="select"] svg {{ fill: #475569 !important; }} /* 小箭頭同步加深 */
+        div[data-baseweb="select"] svg {{ fill: #475569 !important; }}
 
         /* 下拉選單展開後的清單防護 */
         ul[role="listbox"] {{ background-color: {list_bg_color} !important; border: 1px solid {cfg['border']} !important; border-radius: 12px !important; }}
         ul[role="listbox"] li {{ color: {list_text_color} !important; background-color: {list_bg_color} !important; padding: 10px 16px !important; }}
         ul[role="listbox"] li:hover, ul[role="listbox"] li[aria-selected="true"] {{
             background-color: {cfg['accent']} !important;
-            color: #FFFFFF !important; /* 反白時文字強制變純白 */
+            color: #FFFFFF !important; 
         }}
         
         /* 📊 數據指標與折疊卡片微浮動與微縮放動畫 */
@@ -84,29 +85,26 @@ else:
             background: {cfg['card']} !important;
             border: 1px solid {cfg['border']} !important;
             border-radius: 14px !important;
-            box-shadow: {cfg['shadow']} !important;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }}
         div[data-testid="stMetric"]:hover {{
             transform: translateY(-3px) scale(1.01) !important;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08) !important;
         }}
         div[data-testid="stMetricValue"] {{ color: {cfg['accent']} !important; font-weight: 800 !important; }}
         
-        /* 🚀 按鈕動態回饋動畫（點擊微縮放與平滑漸變） */
+        /* 🚀 按鈕動態回饋動畫 */
         div.stButton > button {{
             border-radius: 10px !important;
             transition: all 0.2s ease-in-out !important;
         }}
         div.stButton > button:hover {{
             transform: scale(1.02) !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
         }}
         div.stButton > button:active {{
             transform: scale(0.97) !important;
         }}
     </style>
-    """)
+    """, unsafe_allow_html=True)
 
 # --- 4. 旅程密碼驗證登入機制 ---
 st.markdown("### 🔒 旅程安全驗證")
@@ -183,28 +181,172 @@ with tabs[0]:
                 }).execute()
                 st.rerun()
 
-    # 高相容性安全渲染
+    # 行程列表
     iti_res = supabase.table("itineraries").select("*").eq("trip_id", current_trip_id).order("day_number").order("time_slot").execute()
     if iti_res.data:
         df_iti = pd.DataFrame(iti_res.data)
         for day_num, group in df_iti.groupby("day_number"):
             st.markdown(f"#### 🗓️ 第 {day_num} 天 行程清單")
             for _, row in group.iterrows():
-                with st.container(border=True):
-                    ic1, ic2 = st.columns([1, 5])
-                    ic1.markdown(f"⏱️ **{row['time_slot'][:5]}**")
-                    ic2.markdown(f"**[{row['activity_type']}] {row['title']}**\n\n說明：*{row['note'] if row['note'] else '無'}*")
+                with st.container():
+                    # 用 Markdown 模擬卡片
+                    st.markdown(f"""
+                    <div style="background-color: {cfg['card']}; border: 1px solid {cfg['border']}; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                        ⏱️ <b>{row['time_slot'][:5]}</b> │ <b>[{row['activity_type']}] {row['title']}</b><br>
+                        <small style="color: {cfg['subtext']};">說明：{row['note'] if row['note'] else '無'}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
-                    # 修改與移除（內建微縮放互動動畫按鈕）
                     b1, b2, _ = st.columns([1, 1, 8])
                     with b1:
-                        with st.popover("✏️ 編輯明細"):
+                        with st.popover("✏️ 編輯"):
                             nt = st.text_input("更新項目名稱", value=row['title'], key=f"c_t_{row['id']}")
                             nn = st.text_area("更新備註說明", value=row['note'] if row['note'] else "", key=f"c_n_{row['id']}")
                             if st.button("確認修改", key=f"c_u_{row['id']}", type="primary"):
                                 supabase.table("itineraries").update({"title": nt, "note": nn}).eq("id", row['id']).execute()
                                 st.rerun()
                     with b2:
-                        # 🛠️ 二次安全確認防呆彈窗（帶有平滑互動動畫）
-                        with st.popover("🗑️ 移除節點"):
-                            st.warning("確定
+                        with st.popover("🗑️ 移除"):
+                            st.warning("確定要移除嗎？")
+                            if st.button("確認移除", key=f"c_d_{row['id']}", type="primary", use_container_width=True):
+                                supabase.table("itineraries").delete().eq("id", row['id']).execute()
+                                st.rerun()
+
+# ==================== 頁籤二：團隊即時記帳本 ====================
+with tabs[1]:
+    st.subheader("💰 即時開銷分帳本")
+    
+    with st.container():
+        st.markdown("**📝 記錄新支出項目**")
+        cx1, cx2, cx3 = st.columns(3)
+        with cx1:
+            exp_desc = st.text_input("消費項目名稱", placeholder="例如：晚餐拉麵、交通通票")
+            exp_amount = st.number_input("總金額 (TWD)", min_value=0.0, value=0.0, step=10.0, key="c_amt")
+        with cx2:
+            payer = st.selectbox("付款墊付人：", list(members_dict.keys()), key="c_payer")
+            split_method = st.radio("分攤計算方式：", ["全員平均分攤", "自訂個別金額"], horizontal=True)
+            
+        split_details = {}
+        with cx3:
+            st.markdown("🎯 **分帳平衡即時計算**")
+            if split_method == "全員平均分攤":
+                if len(members_dict) > 0:
+                    share = round(exp_amount / len(members_dict), 2)
+                    for m in members_dict.keys():
+                        split_details[m] = share
+                    st.success(f"全員平均分攤，每人應付：${share:,.2f}")
+                    can_submit = True if exp_amount > 0 else False
+            else:
+                current_total = 0.0
+                for m in members_dict.keys():
+                    amt = st.number_input(f"成員 {m} 負擔金額", min_value=0.0, value=0.0, key=f"c_sp_{m}")
+                    split_details[m] = amt
+                    current_total += amt
+                
+                diff = exp_amount - current_total
+                if abs(diff) < 0.01:
+                    st.success("✅ 分配總額與總金額完全吻合。")
+                    can_submit = True
+                elif diff > 0:
+                    st.warning(f" 還有 ${diff:,.2f} 元尚未分配...")
+                    can_submit = False
+                else:
+                    st.error(f"⚠️ 超出總金額 ${abs(diff):,.2f} 元！")
+                    can_submit = False
+                    
+        if st.button("💾 儲存此筆支出至雲端", disabled=not can_submit, use_container_width=True, type="primary"):
+            supabase.table("expenses").insert({
+                "trip_id": current_trip_id, "description": exp_desc, "amount": exp_amount,
+                "paid_by": members_dict[payer], "split_details": split_details
+            }).execute()
+            st.success("記帳成功！")
+            st.rerun()
+
+    # 結算與明細
+    exp_res = supabase.table("expenses").select("*").eq("trip_id", current_trip_id).execute()
+    if exp_res.data:
+        df_exp = pd.DataFrame(exp_res.data)
+        total_trip_cost = df_exp['amount'].sum()
+        
+        st.markdown("---")
+        st.subheader("📊 花費統計與結算明細")
+        
+        my_paid, my_owe = 0.0, 0.0
+        if selected_identity != "僅進行瀏覽":
+            my_paid = df_exp[df_exp['paid_by'] == members_dict[selected_identity]]['amount'].sum()
+            for _, r in df_exp.iterrows():
+                my_owe += float(r['split_details'].get(selected_identity, 0.0))
+
+        mi1, mi2, mi3 = st.columns(3)
+        with mi1: st.metric("🎨 全團累積總開銷", f"${total_trip_cost:,.2f}")
+        with mi2: 
+            if selected_identity != "僅進行瀏覽": st.metric("💎 我的代墊金額", f"${my_paid:,.2f}")
+        with mi3: 
+            if selected_identity != "僅進行瀏覽": st.metric("📉 我的應付金額", f"${my_owe:,.2f}")
+
+        fig = px.pie(df_exp, values='amount', names='description', hole=0.4, 
+                     template="plotly_white" if "白" in theme_choice or "藍" in theme_choice or "金" in theme_choice or "綠" in theme_choice else "plotly_dark")
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("💵 精簡債務清償方案")
+        balances = {m: 0.0 for m in members_dict.keys()}
+        for exp in exp_res.data:
+            p_name = members_id_to_name[exp['paid_by']]
+            balances[p_name] += float(exp['amount'])
+            for m_name, s_amt in exp['split_details'].items():
+                balances[m_name] -= float(s_amt)
+                
+        debtors = [(k, v) for k, v in balances.items() if v < 0]
+        creditors = [(k, v) for k, v in balances.items() if v > 0]
+        
+        while debtors and creditors:
+            debtor, d_bal = debtors[0]
+            creditor, c_bal = creditors[0]
+            amount_to_pay = min(abs(d_bal), c_bal)
+            
+            with st.container():
+                if debtor == selected_identity:
+                    st.markdown(f"🔴 **【您需還錢】** 請轉帳給 **{creditor}** 👉 🏦 **${amount_to_pay:,.2f}** 元")
+                elif creditor == selected_identity:
+                    st.markdown(f"🎉 **【您將收款】** **{debtor}** 將轉帳給你 👉 💰 **${amount_to_pay:,.2f}** 元")
+                else:
+                    st.markdown(f"🤝 **{debtor}** 應給 **{creditor}** 👉 `${amount_to_pay:,.2f}` 元")
+            
+            balances[debtor] += amount_to_pay
+            balances[creditor] -= amount_to_pay
+            debtors = [(k, v) for k, v in balances.items() if v < -0.01]
+            creditors = [(k, v) for k, v in balances.items() if v > 0.01]
+
+# ==================== 頁籤三：匯率換算工具 ====================
+with tabs[2]:
+    st.subheader("🎒 國際即時匯率換算")
+    
+    if st.button("🔄 點擊刷新最新國際外匯數據", type="secondary", use_container_width=True):
+        with st.spinner("正在連線國際金融資料庫，請稍候..."):
+            st.cache_data.clear()
+            st.success("匯率數據已即時刷新！")
+
+    @st.cache_data(ttl=3600)
+    def get_real_rates():
+        try:
+            res = requests.get("https://open.er-api.com/v6/latest/TWD")
+            return res.json()['rates']
+        except:
+            return {"USD": 0.031, "JPY": 4.65, "EUR": 0.029, "KRW": 41.5}
+
+    rates = get_real_rates()
+    
+    c_r1, c_r2, c_r3, c_r4 = st.columns(4)
+    c_r1.metric("🇯🇵 日圓 (JPY) 基準", f"{rates.get('JPY', 4.65):.2f}")
+    c_r2.metric("🇺🇸 美金 (USD) 基準", f"{rates.get('USD', 0.031):.4f}")
+    c_r3.metric("🇪🇺 歐元 (EUR) 基準", f"{rates.get('EUR', 0.029):.4f}")
+    c_r4.metric("🇰🇷 韓圓 (KRW) 基準", f"{rates.get('KRW', 41.5):.2f}")
+    
+    st.markdown("---")
+    st.markdown("**💱 跨國金額即時試算**")
+    src_currency = st.selectbox("選擇外幣種類：", ["JPY 日圓", "USD 美金", "EUR 歐元", "KRW 韓圓"])
+    foreign_amt = st.number_input("輸入外幣消費金額：", min_value=0.0, value=1000.0, key="c_fx_in")
+    
+    cur_key = src_currency.split()[0]
+    twd_result = foreign_amt / rates.get(cur_key, 1.0) if rates.get(cur_key) else 0.0
+    st.success(f"💰 折合新台幣約：**`${twd_result:,.2f}`** TWD 元")
