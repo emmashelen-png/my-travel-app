@@ -93,7 +93,7 @@ with tabs[0]:
             st.rerun()
 
     # 顯示時間線
-    iti_res = supabase.table("itineraries").eq("trip_id", current_trip_id).order("day_number").order("time_slot").execute()
+    iti_res = supabase.table("itineraries").eq("trip_id", current_trip_id).order_by("day_number").execute()
     if iti_res.data:
         df_iti = pd.DataFrame(iti_res.data)
         for day_num, group in df_iti.groupby("day_number"):
