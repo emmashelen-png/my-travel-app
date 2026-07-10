@@ -11,19 +11,69 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 # 頁面高質感設定
 st.set_page_config(page_title="🧳 智慧隨身旅遊管家", layout="wide", initial_sidebar_state="expanded")
 
-# 注入自訂 CSS，使用安全變數包裹，100% 繞過類型檢查與變數誤判
-css_style = """
+# --- 1.5 原生高質感 PWA 樣式注入（100% 繞過 markdown 類型檢查） ---
+st.html("""
 <style>
-    .stApp { background-color: #121214; color: #e1e1e6; }
-    div[data-testid="stMetricValue"] { font-size: 1.8rem !important; font-weight: bold; color: #00efff; }
-    .stTabs [data-baseweb="tab"] { font-size: 1.1rem; font-weight: 600; padding: 10px 20px; }
-    .trip-card { background-color: #1a1a1e; padding: 20px; border-radius: 12px; border: 1px solid #29292e; margin-bottom: 15px; }
-    .expense-card { background-color: #1a1a1e; padding: 15px; border-radius: 8px; border-left: 5px solid #00efff; margin-bottom: 10px; }
-    .transit-card { background-color: #1f1b24; padding: 15px; border-radius: 8px; border-left: 5px solid #bb86fc; margin-bottom: 10px; }
-    div.stButton > button:first-child { border-radius: 8px; }
+    /* 全域背景與優雅字體 */
+    .stApp { 
+        background: linear-gradient(135deg, #121214 0%, #1a1a1e 100%); 
+        color: #f4f4f5;
+    }
+    /* 頂級數據指標卡片 */
+    div[data-testid="stMetric"] {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 15px 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    div[data-testid="stMetricValue"] { 
+        font-size: 2rem !important; 
+        font-weight: 800 !important; 
+        color: #00f0ff !important; 
+    }
+    /* 精緻頁籤設計 */
+    .stTabs [data-baseweb="tab"] { 
+        font-size: 1.1rem; 
+        font-weight: 600; 
+        padding: 12px 24px;
+        color: #a1a1aa;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        color: #00f0ff !important;
+        border-bottom-color: #00f0ff !important;
+    }
+    /* 行程與記帳高質感卡片 */
+    .trip-card { 
+        background: rgba(255, 255, 255, 0.04); 
+        padding: 22px; 
+        border-radius: 14px; 
+        border: 1px solid rgba(255, 255, 255, 0.08); 
+        margin-bottom: 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .expense-card { 
+        background: rgba(0, 240, 255, 0.03); 
+        padding: 18px; 
+        border-radius: 10px; 
+        border-left: 6px solid #00f0ff; 
+        border-top: 1px solid rgba(0, 240, 255, 0.1);
+        border-right: 1px solid rgba(0, 240, 255, 0.1);
+        border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+        margin-bottom: 12px; 
+    }
+    .transit-card { 
+        background: rgba(187, 134, 252, 0.03); 
+        padding: 18px; 
+        border-radius: 10px; 
+        border-left: 6px solid #bb86fc; 
+        border-top: 1px solid rgba(187, 134, 252, 0.1);
+        border-right: 1px solid rgba(187, 134, 252, 0.1);
+        border-bottom: 1px solid rgba(187, 134, 252, 0.1);
+        margin-bottom: 12px; 
+    }
 </style>
-"""
-st.markdown(str(css_style), unsafe_allowed_html=True)
+""")
 
 # --- 2. 側邊欄：旅程庫與管理 ---
 st.sidebar.title("🧳 我的旅遊庫")
