@@ -27,7 +27,7 @@ theme_styles = {
     "🌿 靜謐灰綠 (北歐極簡風)": {"bg": "#F4F7F4", "sidebar_bg": "#FFFFFF", "card": "#FFFFFF", "text": "#162E1A", "sidebar_text": "#2B4C30", "accent": "#16A34A", "border": "#D2E0D1", "subtext": "#5A735E", "is_dark": False}
 }
 
-# --- 3. 雲端相容版 CSS 注入（修正 st.html 錯誤，並徹底解決選單灰色問題） ---
+# --- 3. 雲端相容版 CSS 注入（精準重寫子元件文字，徹底解決選單白色隱形問題） ---
 if theme_choice == "🌓 智能感光 (隨系統自動日夜切換)":
     st.markdown("""
     <style>
@@ -62,20 +62,24 @@ else:
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] span {{ color: {cfg['sidebar_text']} !important; }}
         
-        /* ==================== 🎯 核心修復：強制將所有輸入框之文字與符號改為深色 ==================== */
+        /* ==================== 🎯 核心修復：徹底粉碎下拉選單文字白化/灰色隱形 ==================== */
         
-        /* A. 下拉選單（Selectbox）收合狀態之文字與符號 */
+        /* 1. 精準攔截下拉選單中所有可能的子標籤（div, span, p），強制改為高對比深色 */
         div[data-baseweb="select"] div[role="button"],
         div[data-baseweb="select"] div,
         div[data-baseweb="select"] span,
-        div[data-baseweb="select"] p {{
+        div[data-baseweb="select"] p,
+        .stSelectbox div[data-baseweb="select"] *,
+        .stSidebar div[data-baseweb="select"] * {{
             color: #1E293B !important; 
             font-weight: 600 !important;
+            -webkit-text-fill-color: #1E293B !important; /* 強制覆蓋瀏覽器內建的反白文字渲染 */
         }}
+        
+        /* 2. 小箭頭圖標同步轉為深石墨色 */
         div[data-baseweb="select"] svg {{ fill: #334155 !important; }}
 
-        /* B. 全域單行文字、多行文字、數字、密碼輸入框（Input, TextArea, Number, Password） */
-        /* 無論在日間或夜間模式，只要使用者準備輸入文字，外框底色強制化為高質感亮白，字體與符號一律改為深色 */
+        /* 3. 全域單行文字、多行文字、數字、密碼輸入框 */
         div[data-testid="stTextInput"] input,
         div[data-testid="stTextArea"] textarea,
         div[data-testid="stNumberInput"] input {{
@@ -83,10 +87,9 @@ else:
             background-color: #FFFFFF !important;
             border: 1px solid {cfg['border']} !important;
             font-weight: 600 !important;
-            -webkit-text-fill-color: #1E293B !important; /* 強制覆蓋 Safari 瀏覽器底層字體染色 */
+            -webkit-text-fill-color: #1E293B !important;
         }}
         
-        /* C. 密碼輸入框右側的「小眼睛查看符號」與數字輸入框的上下加減符號強制加深 */
         div[data-testid="stTextInput"] button svg,
         div[data-testid="stNumberInput"] button svg {{
             fill: #334155 !important;
@@ -101,7 +104,7 @@ else:
             color: #FFFFFF !important; 
         }}
         
-        /* 📊 數據指標與折疊卡片微浮動與微縮放動畫 */
+        /* 📊 數據指標與折疊卡片微動態動畫 */
         div[data-testid="stMetric"], div[data-testid="stExpander"] {{
             background: {cfg['card']} !important;
             border: 1px solid {cfg['border']} !important;
@@ -210,7 +213,6 @@ with tabs[0]:
             st.markdown(f"#### 🗓️ 第 {day_num} 天 行程清單")
             for _, row in group.iterrows():
                 with st.container():
-                    # 用 Markdown 模擬卡片
                     st.markdown(f"""
                     <div style="background-color: {cfg['card']}; border: 1px solid {cfg['border']}; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
                         ⏱️ <b>{row['time_slot'][:5]}</b> │ <b>[{row['activity_type']}] {row['title']}</b><br>
