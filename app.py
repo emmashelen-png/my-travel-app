@@ -12,7 +12,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 st.set_page_config(page_title="🧳 智慧隨身旅遊管家", layout="wide", initial_sidebar_state="expanded")
 
 # 注入自訂 CSS，讓介面像 App 一樣精美、消除陽春感
-st.markdown("""
+st.markdown(F"""
 <style>
     .stApp { background-color: #121214; color: #e1e1e6; }
     div[data-testid="stMetricValue"] { font-size: 1.8rem !important; font-weight: bold; color: #00efff; }
