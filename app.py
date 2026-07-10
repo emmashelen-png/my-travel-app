@@ -62,30 +62,36 @@ else:
         section[data-testid="stSidebar"] {{ background-color: {cfg['sidebar_bg']} !important; border-right: 1px solid {cfg['border']} !important; }}
         section[data-testid="stSidebar"] *, section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] span {{ color: {cfg['sidebar_text']} !important; }}
         
-        /* 🎯 最終解決：將所有輸入框與選單在夜間/日間模式下，一律強制維持「白底深色字」 */
-        /* 1. 鎖定下拉選單：不管背景多黑，選單外框一律強制白底、文字絕對深色 */
+        /* ==================== 🎯 核心修復：強制將所有輸入框之文字與符號改為深色 ==================== */
+        
+        /* A. 下拉選單（Selectbox）收合狀態之文字與符號 */
         div[data-baseweb="select"] div[role="button"],
+        div[data-baseweb="select"] div,
         div[data-baseweb="select"] span,
         div[data-baseweb="select"] p {{
-            background-color: #FFFFFF !important;
-            color: #0F172A !important;
+            color: #1E293B !important; 
             font-weight: 600 !important;
         }}
-        
-        /* 2. 鎖定普通輸入框（文字、密碼、數字、時間輸入框）：一律強制白底、字體深色 */
-        div[data-baseweb="input"] input,
-        div[data-baseweb="textarea"] textarea,
-        input[type="text"],
-        input[type="password"],
-        input[type="number"] {{
-            background-color: #FFFFFF !important;
-            color: #0F172A !important; /* 強制輸入的字體絕對是清楚的深石墨色 */
-            font-weight: 600 !important;
-            -webkit-text-fill-color: #0F172A !important; /* 確保手機版瀏覽器也不會褪色 */
-        }}
-        
-        /* 3. 小箭頭圖標加深對比 */
         div[data-baseweb="select"] svg {{ fill: #334155 !important; }}
+
+        /* B. 全域單行文字、多行文字、數字、密碼輸入框（Input, TextArea, Number, Password） */
+        /* 無論在日間或夜間模式，只要使用者準備輸入文字，外框底色強制化為高質感亮白，字體與符號一律改為深色 */
+        div[data-testid="stTextInput"] input,
+        div[data-testid="stTextArea"] textarea,
+        div[data-testid="stNumberInput"] input {{
+            color: #1E293B !important;
+            background-color: #FFFFFF !important;
+            border: 1px solid {cfg['border']} !important;
+            font-weight: 600 !important;
+            -webkit-text-fill-color: #1E293B !important; /* 強制覆蓋 Safari 瀏覽器底層字體染色 */
+        }}
+        
+        /* C. 密碼輸入框右側的「小眼睛查看符號」與數字輸入框的上下加減符號強制加深 */
+        div[data-testid="stTextInput"] button svg,
+        div[data-testid="stNumberInput"] button svg {{
+            fill: #334155 !important;
+            color: #334155 !important;
+        }}
 
         /* 下拉選單展開後的清單防護 */
         ul[role="listbox"] {{ background-color: {list_bg_color} !important; border: 1px solid {cfg['border']} !important; border-radius: 12px !important; }}
