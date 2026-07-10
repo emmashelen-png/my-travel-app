@@ -173,14 +173,15 @@ with tabs[0]:
                 is_trans = "交通" in row['activity_type']
                 card_class = "transit-card" if is_trans else "trip-card"
                 
-                # 美化卡片渲染
-                st.markdown(f"""
+               # 美化卡片渲染（使用最新官方 HTML 標準，精緻卡片）
+                st.html(f"""
                 <div class="{card_class}">
-                    <span style='color:#00efff; font-weight:bold;'>⏱️ {row['time_slot'][:5]}</span> | 
-                    <span style='font-size:1.1rem; font-weight:bold;'>{row['activity_type']} - {row['title']}</span>
-                    <br><small style='color:#a1a1aa;'>{row['note'] if row['note'] else '無備註'}</small>
+                    <span style='color:#00efff; font-weight:bold; letter-spacing: 1px;'>⏱️ {row['time_slot'][:5]}</span> 
+                    <span style='color: rgba(255,255,255,0.4); margin: 0 8px;'>|</span>
+                    <span style='font-size:1.1rem; font-weight:600; color: #ffffff;'>{row['activity_type']} - {row['title']}</span>
+                    <div style='margin-top: 6px; font-size: 0.9rem; color:#a1a1aa; line-height: 1.4;'>ℹ️ {row['note'] if row['note'] else '無備註说明'}</div>
                 </div>
-                """, unsafe_allowed_html=True)
+                """)
                 
                 # 修改與刪除按鈕排版
                 cb1, cb2, _ = st.columns([1, 1, 8])
