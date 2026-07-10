@@ -65,7 +65,7 @@ if selected_identity != "瀏覽者":
     st.session_state['my_identity'] = selected_identity
 
 # --- 4. 頁籤分類：行程、記帳、工具 ---
-tabs = st.tabs(["📅 時間線行程", "💰 Spliit 級即時分帳", "🎒 實用工具箱"])
+tabs = st.tabs(["📅 時間線行程", "💰 即時分帳", "🎒 實用工具箱"])
 
 # ==================== 頁籤一：時間線行程 ====================
 with tabs[0]:
@@ -116,7 +116,7 @@ with tabs[0]:
 
 # ==================== 頁籤二：即時分帳系統 ====================
 with tabs[1]:
-    st.header("分帳帳本 (Spliit 模式)")
+    st.header("分帳帳本")
     
     # 記帳輸入區
     with st.expander("📝 隨手記一筆支出", expanded=True):
